@@ -1,0 +1,43 @@
+name: Release to npm
+
+# Publishes when a maintainer pushes a tag like v0.2.0. Uses npm Trusted Publishing (OIDC),
+# so no long-lived npm token is stored anywhere, and npm attaches provenance automatically
+# for public repos. The "npm" environment should require a reviewer approval in GitHub
+# (Settings > Environments) before this job runs.
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/veriq-sdk
+    permissions:
+      contents: read
+      id-token: write # required for Trusted Publishing
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+      - name: Check npm supports trusted publishing (>= 11.5.1)
+        run: |
+          npm --version
+          node -e "const [a,b,c]=process.argv[1].split('.').map(Number); if (a<11||(a===11&&(b<5||(b===5&&c<1)))) { console.error('npm >= 11.5.1 required'); process.exit(1); }" "$(npm --version)"
+      - name: Check tag matches package version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "package.json ($version) != tag ($GITHUB_REF_NAME)"; exit 1; }
+      - run: npm ci --ignore-scripts
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm publish

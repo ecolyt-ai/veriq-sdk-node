@@ -1,0 +1,44 @@
+{
+  "name": "veriq-sdk",
+  "version": "0.2.0",
+  "description": "Official Node.js SDK for the Veriq AI search, extract, map, and crawl API (beta)",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.19",
+    "typescript": "5.7.3"
+  },
+  "homepage": "https://veriq.ecolyt.ai/docs/",
+  "author": "Ecolyt.ai LLC <support@ecolyt.ai>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ecolyt-ai/veriq-sdk-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ecolyt-ai/veriq-sdk-node/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
